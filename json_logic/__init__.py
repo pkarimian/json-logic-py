@@ -2,7 +2,9 @@
 # https://github.com/jwadhams/json-logic-js
 from __future__ import unicode_literals
 
+import copy
 import sys
+
 from six.moves import reduce
 import logging
 
@@ -187,8 +189,14 @@ def jsonLogic(tests, data=None):
     if not isinstance(values, list) and not isinstance(values, tuple):
         values = [values]
 
-    # Recursion!
-    values = [jsonLogic(val, data) for val in values]
+    if (operator=='if'):
+        res=if_(jsonLogic(values[0],data))
+        values=[res, jsonLogic(values[1],data), ''] if(res) else [res, '', jsonLogic(values[2],data)]
+    else:
+        # Recursion!
+        values = [jsonLogic(val, data) for val in values]
+
+
 
     if operator == 'var':
         return get_var(data, *values)
